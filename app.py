@@ -1,5 +1,8 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
+from eventlet import monkey_patch
+
+monkey_patch()
 
 app = Flask(__name__)
 app.config.from_pyfile('config/config.cfg')

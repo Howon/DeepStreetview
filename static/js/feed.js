@@ -1,5 +1,6 @@
-const [glat, glon] = [40.8058134, -73.962682];
+"use strict";
 
+const viewLoader = require("./view");
 
 const latLonGen = (lat, lon) => {
   return {
@@ -8,48 +9,59 @@ const latLonGen = (lat, lon) => {
       lng: lon
     },
     pov: {
-      heading: 270,
+      heading: 90,
       pitch: 0
     },
-    zoom: 1
-  }
+    zoom: 1.5
+  };
 };
 
 (() => {
-      let canvas;
-      const socket = io();
-  // if (navigator.geolocation) {
-  //   navigator.geolocation.getCurrentPosition(pos => {
-      const panorama = new google.maps.StreetViewPanorama(
-        document.getElementById('street-view'), latLonGen(glat, glon));//latLonGen(pos.coords.latitude, pos.coords.longitude));
+  const socket = io();
 
-      const restyleCanvas = (img) => {
-        socket.emit("req_style_transfer", img);
+  const [glat, glon] = [40.8058134, -73.962682];
+  const view = document.getElementById("view");
+  const controller = document.getElementById("control");
 
-        // socket.on('imageStylized', newImg => {
-        //   $("#img").attr("src","data:image/png;base64," + b64(newImg.buffer));
-        // });
+  // navigator.geolocation.getCurrentPosition(pos => {
+  viewLoader(view, [glat, glon], (image, cb) => cb(image));
+  // // });
+
+  const p = new google.maps.StreetViewPanorama(controller, latLonGen(glat, glon)); //latLonGen(pos.coords.latitude, pos.coords.longitude));
+
+  const bodyObserver = new MutationObserver((mutations) => {
+    mutations.forEach(mutation => {
+      const canvases = document.getElementsByTagName("canvas");
+
+      if (canvases.length === 2) {
+        // console.log(canvases)
+        Array.from(canvases).forEach(canvas => {
+          if (canvas.parentElement.tagName === "DIV") {
+            canvas.style.display = "none";
+          } else {
+            canvas.style.top = "0";
+            canvas.style.position = "absolute";
+          }
+        });
+
+        const gMapsArea = document.querySelector("#control div").getElementsByTagName("div")[0];
+
+        [controller, gMapsArea].concat(Array.from(gMapsArea.getElementsByTagName("div")))
+          .forEach(x => x.style.backgroundColor = "transparent");
+
+        console.log(document.getElementsByTagName("svg"));
       }
+    });
+  });
 
-      panorama.addListener('pano_changed', function() {
-        canvas = document.getElementsByTagName("canvas")[0];
-        canvas.img
-        restyleCanvas(canvas.toDataURL());
-      });
+  const bodyObserveConf = {
+    childList: true
+  };
 
-      // panorama.addListener('links_changed', function() {
-      //   console.log('2')
-      //   restyleCanvas(canvas.toDataURL("image/jpeg", 0.5));
-      // });
+  bodyObserver.observe(document.body, bodyObserveConf);
 
-      // panorama.addListener('position_changed', function() {
-      //   console.log('3')
-
-      // });
-
-      // panorama.addListener('pov_changed', function() {
-
-      // });
-    // });
-  // }
-})()
+  p.addListener("pano_changed", () => {
+    console.log(p);
+    viewLoader(view, [p.position.lat(), p.position.lng()]);
+  });
+})();
