@@ -4,9 +4,11 @@ const getTiles = require("./tiles");
 const loader = require("async-image-loader");
 const Emitter = require("events").EventEmitter;
 
+const emitter = new Emitter();
+
 const ZERO = [0, 0];
 
-module.exports = (id, opt, modifier) => {
+module.exports = (id, opt, transform) => {
   opt = opt || {};
 
   const data = getTiles(id, opt.zoom, opt.tiles);
@@ -17,16 +19,15 @@ module.exports = (id, opt, modifier) => {
   const images = data.images;
   const tileWidth = data.tileWidth;
   const tileHeight = data.tileHeight;
-  const emitter = new Emitter();
 
   const start = () => {
-    const imageFetcher = (image) => {
+    const transformPromise = (image) => {
       return new Promise(resolve => {
-        modifier(image, resolve);
+        transform(image, resolve);
       });
     };
 
-    Promise.all(images.map(image => imageFetcher(image))).then(newImages => {
+    Promise.all(images.map(image => transformPromise(image))).then(newImages => {
       emitter.emit("start", data);
 
       loader(newImages, {

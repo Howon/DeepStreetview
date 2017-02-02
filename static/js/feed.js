@@ -1,6 +1,8 @@
 "use strict";
 
-const viewLoader = require("./view");
+const { stitch: viewLoader, invert: invertCamera } = require("./view");
+const HEADING = 90;
+const PITCH = 0;
 
 const latLonGen = (lat, lon) => {
   return {
@@ -9,59 +11,69 @@ const latLonGen = (lat, lon) => {
       lng: lon
     },
     pov: {
-      heading: 90,
-      pitch: 0
+      heading: HEADING,
+      pitch: PITCH
     },
-    zoom: 1.5
+    zoom: 0.9
   };
 };
 
 (() => {
-  const socket = io();
+  // const socket = io();
 
   const [glat, glon] = [40.8058134, -73.962682];
   const view = document.getElementById("view");
   const controller = document.getElementById("control");
 
-  // navigator.geolocation.getCurrentPosition(pos => {
+  // // navigator.geolocation.getCurrentPosition(pos => {
   viewLoader(view, [glat, glon], (image, cb) => cb(image));
-  // // });
+  // // // });
 
   const p = new google.maps.StreetViewPanorama(controller, latLonGen(glat, glon)); //latLonGen(pos.coords.latitude, pos.coords.longitude));
 
-  const bodyObserver = new MutationObserver((mutations) => {
+  const bodyObserver = new MutationObserver((mutations, observer) => {
     mutations.forEach(mutation => {
       const canvases = document.getElementsByTagName("canvas");
 
       if (canvases.length === 2) {
-        // console.log(canvases)
-        Array.from(canvases).forEach(canvas => {
-          if (canvas.parentElement.tagName === "DIV") {
-            canvas.style.display = "none";
-          } else {
-            canvas.style.top = "0";
-            canvas.style.position = "absolute";
-          }
-        });
+        const [canvasA, canvasB] = canvases;
+
+        const parent = canvasA.parentElement;
 
         const gMapsArea = document.querySelector("#control div").getElementsByTagName("div")[0];
+        const overLay = document.getElementById("control").firstChild.firstChild.firstChild;
+        const len = overLay.childNodes.length;
+
+        parent.style = {};
+
+        canvasB.style.top = "0";
+        canvasB.style.position = "absolute";
+        canvasB.setAttribute("id", canvasA.id);
+
+        parent.removeChild(canvasA);
+        parent.appendChild(canvasB);
+
+        overLay.removeChild(overLay.childNodes[len - 1]);
+        overLay.appendChild(parent);
 
         [controller, gMapsArea].concat(Array.from(gMapsArea.getElementsByTagName("div")))
           .forEach(x => x.style.backgroundColor = "transparent");
 
-        console.log(document.getElementsByTagName("svg"));
+        observer.disconnect();
       }
     });
   });
 
-  const bodyObserveConf = {
+  bodyObserver.observe(document.body, {
     childList: true
-  };
-
-  bodyObserver.observe(document.body, bodyObserveConf);
+  });
 
   p.addListener("pano_changed", () => {
-    console.log(p);
-    viewLoader(view, [p.position.lat(), p.position.lng()]);
+    viewLoader(view, [p.position.lat(), p.position.lng()], (image, cb) => cb(image));
+  });
+
+  p.addListener("pov_changed", () => {
+    // console.log(p.getPov())
+    invertCamera(0, 3);
   });
 })();

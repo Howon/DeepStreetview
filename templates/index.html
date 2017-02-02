@@ -20,13 +20,23 @@
         z-index: 50;
         background-color: transparent;
       }
+
+      video {
+        float: left;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 50%;
+        display: inline-block;
+      }
     </style>
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}"></script>
   </head>
   <body id="body">
     <div id="view"></div>
-    <!-- <div id="control"></div> -->
+    <div id="control"></div>
     <script src="{{ url_for('static', filename='js/bundle.js') }}" type="text/javascript"></script>
   </body>
 </html>
