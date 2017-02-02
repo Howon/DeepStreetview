@@ -1,0 +1,28 @@
+{
+  "name": "rts",
+  "version": "1.0.0",
+  "description": "live time streetview style transfer",
+  "main": "app.py",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Howon/rst.git"
+  },
+  "author": "Howon Byun, Jibben Hillen, Mitchell Gouzenko",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Howon/rst/issues"
+  },
+  "scripts": {
+    "start": "browserify static/js/feed.js -o static/js/bundle.js ; python app.py"
+  },
+  "homepage": "https://github.com/Howon/rst#readme",
+  "dependencies": {
+    "extract-streetview": "^1.2.0",
+    "google-panorama-by-location": "^4.1.1",
+    "google-panorama-tiles": "^1.0.3",
+    "google-panorama-url": "^1.0.0",
+    "google-panorama-zoom-level": "^1.0.0",
+    "three": "^0.71.0",
+    "three-orbit-viewer": "^69.3.0"
+  }
+}
