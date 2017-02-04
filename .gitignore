@@ -2,3 +2,5 @@ config/
 node_modules/*
 !node_modules/three-orbit-controls/
 static/js/bundle.js
+*.swp
+*.pyc

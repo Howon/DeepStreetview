@@ -3,6 +3,7 @@
 const viewLoader = require("./view");
 const HEADING = 90;
 const PITCH = 0;
+const IPADDRESSES = ["209.2.230.22"]
 
 const latLonGen = (lat, lon) => {
   return {
@@ -20,22 +21,48 @@ const latLonGen = (lat, lon) => {
 };
 
 (() => {
+  let image_id = 0;
+  const callback_map = {}
   const socket = io();
-  // const tfSocket = io('jibben');
+  const tf_sockets = IPADDRESSES.reduce((acc, ip) => {
+    acc[ip] = io(ip);
+
+    return acc;
+  }, {});
 
   const [glat, glon] = [40.8058134, -73.962682];
   const view = document.getElementById("view");
   const controller = document.getElementById("control");
   const searchDom = document.getElementById('map');
 
-  // // navigator.geolocation.getCurrentPosition(pos => {
-  viewLoader(view, [glat, glon], (image, cb) => {
-  //   socket.emit("", image)
+  socket.on("transformed", image => {
+    var iid = parseInt(image.id);
+    // console.log(image);
 
-  //   // tfSocket.on("transformed", )
-    cb(image)
-  });
-  // // // });
+    if (callback_map.hasOwnProperty(iid)) {
+      callback_map[iid](image);
+      // delete callback_map[iid];
+    } else {
+      // console.log(callback_map);
+      // console.log("Could not find the callback to invoke");
+    }
+  })
+
+  let transform = (image, cb) => {
+
+    image['id'] = image_id;
+    if (image_id > 100000) {
+      image_id = 0;
+    }
+    callback_map[image_id] = cb;
+    image_id++;
+    socket.emit("transform", image);
+
+  }
+    // cb(image);
+
+  viewLoader(view, [glat, glon], transform);
+
   var map = new google.maps.Map(searchDom, {
     center: {
       lat: glat,
@@ -122,11 +149,7 @@ const latLonGen = (lat, lon) => {
     childList: true
   });
 
-  // p.addListener("pano_changed", () => {
-  //   viewLoader(view, [p.position.lat(), p.position.lng()], (image, cb) => cb(image));
-  // });
-
-  // p.addListener("pov_changed", () => {
-  //   // console.log(p.getPov())
-  // });
+  p.addListener("pano_changed", () => {
+    viewLoader(view, [p.position.lat(), p.position.lng()], transform);
+  });
 })();
