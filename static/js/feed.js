@@ -49,17 +49,17 @@ const latLonGen = (lat, lon) => {
   })
 
   let transform = (image, cb) => {
-
     image['id'] = image_id;
+
     if (image_id > 100000) {
       image_id = 0;
     }
+
     callback_map[image_id] = cb;
     image_id++;
-    socket.emit("transform", image);
 
+    socket.emit("transform", image);
   }
-    // cb(image);
 
   viewLoader(view, [glat, glon], transform);
 
