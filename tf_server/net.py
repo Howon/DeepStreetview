@@ -29,12 +29,17 @@ class Stylizer(object):
 
         return styled
 
-    def stylize(self, img_path):
+    def stylize_file(self, img_path):
         img = Image.open(img_path)
         img = img.convert('RGB')
-        img_arr = sp.array(img).astype(np.float16)
 
-        return self._process_image(img_arr)
+        return self._process_image(img)
+
+    def stylize(self, img_file):
+        img = Image.open(img_file)
+        img = img.convert('RGB')
+
+        return self._process_image(img)
 
     def save(self, img, outpath):
         img.save(outpath)
