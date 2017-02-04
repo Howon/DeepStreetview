@@ -27,7 +27,7 @@ const latLonGen = (lat, lon) => {
 
   const callbackMap = {};
 
-  const [glat, glon] = [40.8058134, -73.962682];
+  let [glat, glon] = [40.8058134, -73.962682];
   const view = document.getElementById("view");
   const controller = document.getElementById("control");
   const searchDom = document.getElementById("map");
@@ -54,8 +54,12 @@ const latLonGen = (lat, lon) => {
     }
   }
 
-  viewLoader(view, [glat, glon], (img, cb) => {
-    transform(img, cb, style);
+  const getLatLon = () => {
+    return [glat, glon];
+  }
+
+  viewLoader(view, getLatLon(), (img, cb) => {
+    transform(img, cb, currentStyle);
   });
 
   const styleOptionButtons = Array.from(document.getElementsByClassName("stylelist"));
@@ -75,8 +79,8 @@ const latLonGen = (lat, lon) => {
       currentStyle = this.getAttribute("data-model");
       this.style.filter = "none";
 
-      viewLoader(view, [glat, glon], (img, cb) => {
-        transform(img, cb, style);
+      viewLoader(view, getLatLon(), (img, cb) => {
+        transform(img, cb, currentStyle);
       });
     })
   });
@@ -98,17 +102,16 @@ const latLonGen = (lat, lon) => {
   map.controls[google.maps.ControlPosition.TOP_LEFT].push(inputDom);
 
   searchArea.addListener("places_changed", function() {
-
     const places = searchArea.getPlaces();
 
     if (places.length == 0) {
       return;
     }
 
-    const newLat = places[0].geometry.location.lat();
-    const newLong = places[0].geometry.location.lng();
+    glat = places[0].geometry.location.lat();
+    glon = places[0].geometry.location.lng();
 
-    viewLoader(view, [newLat, newLong], (image, cb) => cb(image));
+    viewLoader(view, getLatLon(), (image, cb) => cb(image));
   });
 
   const removeUnnecessaryDoms = new MutationObserver((mutations, observer) => {
@@ -169,8 +172,11 @@ const latLonGen = (lat, lon) => {
   });
 
   p.addListener("pano_changed", () => {
-    viewLoader(view, [p.position.lat(), p.position.lng()], (img, cb) => {
-      transform(img, cb, style);
+    glat = p.position.lat();
+    glon = p.position.lng();
+
+    viewLoader(view, getLatLon(), (img, cb) => {
+      transform(img, cb, currentStyle);
     });
   });
 })();
