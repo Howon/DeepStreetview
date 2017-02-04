@@ -41,17 +41,15 @@ def _img_to_str(img):
     return base64.b64encode(buf.getvalue())
 
 @socketio.on('style')
-def stylize(url):
-    print url
-    img_url = urllib2.urlopen(url)
+def stylize(url_json):
+    img_url = urllib2.urlopen(url_json['url'])
     img_data = StringIO(img_url.read())
 
     img = tf.stylize(img_data)
-    tf.save(img, 'test.jpg')
 
     img_str = _img_to_str(img)
-    emit('stylized', img_str)
-    print img_str
+    emit('stylized', {'id' : url_json['id'], 'img' : img_str})
+    print 'emitted id: %s' % url_json['id']
 
 if __name__ == "__main__":
     socketio.run(app, host="0.0.0.0", port=1337, debug=True)
