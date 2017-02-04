@@ -5,7 +5,7 @@ const RANDSTRGEN = require("randomstring");
 
 const HEADING = 90;
 const PITCH = 0;
-const IPADDRESSES = ["209.2.230.22"]
+const NOSTYLE = "NONE";
 
 const latLonGen = (lat, lon) => {
   return {
@@ -38,23 +38,25 @@ const latLonGen = (lat, lon) => {
     }
   })
 
-  let currentStyle = "none";
+  let currentStyle = NOSTYLE;
 
-  const transform = (image, cb) => {
-    if (currentStyle === "none") {
+  const transform = (image, cb, style) => {
+    if (style === NOSTYLE) {
       cb(image);
     } else {
       const imageId = RANDSTRGEN.generate();
 
       image.id = imageId;
-      image.style = currentStyle;
+      image.style = style;
 
       callbackMap[imageId] = cb;
       socket.emit("transform", image);
     }
   }
 
-  viewLoader(view, [glat, glon], transform);
+  viewLoader(view, [glat, glon], (img, cb) => {
+    transform(img, cb, style);
+  });
 
   const styleOptionButtons = Array.from(document.getElementsByClassName("stylelist"));
 
@@ -66,12 +68,16 @@ const latLonGen = (lat, lon) => {
 
   styleOptionButtons.forEach(li => {
     li.addEventListener("click", function(e) {
-      if (currentStyle !== "none") {
+      if (currentStyle !== NOSTYLE) {
         styleOnMap[currentStyle].style.filter = "grayscale(.2) opacity(0.5)";
       }
 
       currentStyle = this.getAttribute("data-model");
       this.style.filter = "none";
+
+      viewLoader(view, [glat, glon], (img, cb) => {
+        transform(img, cb, style);
+      });
     })
   });
 
@@ -94,6 +100,7 @@ const latLonGen = (lat, lon) => {
   searchArea.addListener("places_changed", function() {
 
     const places = searchArea.getPlaces();
+
     if (places.length == 0) {
       return;
     }
@@ -162,6 +169,8 @@ const latLonGen = (lat, lon) => {
   });
 
   p.addListener("pano_changed", () => {
-    viewLoader(view, [p.position.lat(), p.position.lng()], transform);
+    viewLoader(view, [p.position.lat(), p.position.lng()], (img, cb) => {
+      transform(img, cb, style);
+    });
   });
 })();
