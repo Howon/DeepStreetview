@@ -20,85 +20,77 @@ const latLonGen = (lat, lon) => {
 };
 
 (() => {
-  // const socket = io();
+  const socket = io();
+  // const tfSocket = io('jibben');
 
   const [glat, glon] = [40.8058134, -73.962682];
   const view = document.getElementById("view");
-  const searchDom = document.getElementById('map');
   const controller = document.getElementById("control");
+  const searchDom = document.getElementById('map');
 
   // // navigator.geolocation.getCurrentPosition(pos => {
-  viewLoader(view, [glat, glon], (image, cb) => cb(image));
+  viewLoader(view, [glat, glon], (image, cb) => {
+  //   socket.emit("", image)
+
+  //   // tfSocket.on("transformed", )
+    cb(image)
+  });
   // // // });
-  // var map = new google.maps.Map(searchDom, {
-  //   center: {
-  //     lat: glat,
-  //     lng: glon
-  //   },
-  //   zoom: 13,
-  //   disablePanMomentum: true
-  // });
+  var map = new google.maps.Map(searchDom, {
+    center: {
+      lat: glat,
+      lng: glon
+    },
+    zoom: 13,
+    disablePanMomentum: true
+  });
 
-//   const inputDom = document.getElementById('pac-input');
-//   const searchArea = new google.maps.places.SearchBox(inputDom);
-
-//   map.controls[google.maps.ControlPosition.TOP_LEFT].push(inputDom);
-
-//   searchArea.addListener('places_changed', function() {
-
-//     const places = searchArea.getPlaces();
-// console.log(places)
-//     if (places.length == 0) {
-//       return;
-//     }
-
-//     // For each place, get the icon, name and location.
-//     const bounds = new google.maps.LatLngBounds();
-//     places.forEach(function(place) {
-//       if (!place.geometry) {
-//         console.log("Returned place contains no geometry");
-//         return;
-//       }
-
-//       if (place.geometry.viewport) {
-//         // Only geocodes have viewport.
-//         bounds.union(place.geometry.viewport);
-//       } else {
-//         bounds.extend(place.geometry.location);
-//       }
-//     });
-
-//     map.fitBounds(bounds);
-//   });
+  const inputDom = document.getElementById('pac-input');
+  const searchArea = new google.maps.places.SearchBox(inputDom);
 
   const p = new google.maps.StreetViewPanorama(controller, latLonGen(glat, glon)); //latLonGen(pos.coords.latitude, pos.coords.longitude));
 
+  map.controls[google.maps.ControlPosition.TOP_LEFT].push(inputDom);
+
+  searchArea.addListener('places_changed', function() {
+
+    const places = searchArea.getPlaces();
+    if (places.length == 0) {
+      return;
+    }
+
+    const newLat = places[0].geometry.location.lat();
+    const newLong = places[0].geometry.location.lng();
+
+    viewLoader(view, [newLat, newLong], (image, cb) => cb(image));
+  });
+
   const removeUnnecessaryDoms = new MutationObserver((mutations, observer) => {
     mutations.forEach(mutation => {
-      // const mapDivs = document.querySelector("#map div");
+      const mapDivs = document.querySelector("#map div");
 
-      // if (mapDivs){
-      //   const mapDom = mapDivs.firstChild;
+      if (mapDivs){
+        const mapDom = mapDivs.firstChild;
 
-      //   searchDom.firstChild.style.backgroundColor = "transparent"
+        searchDom.firstChild.style.backgroundColor = "transparent";
 
-      //   if (mapDom && mapDom.childNodes.length === 11) {
-      //     Array.from(mapDom.childNodes).filter(node => node.nodeName === "DIV").forEach(node => {
-      //       node.parentNode.removeChild(node);
-      //     })
+        if (mapDom && mapDom.childNodes.length === 11) {
+          Array.from(mapDom.childNodes).filter(node => node.nodeName === "DIV").forEach(node => {
+            node.parentNode.removeChild(node);
+          })
 
-      //     inputDom.parentNode.removeChild(inputDom);
-      //     controller.appendChild(inputDom);
-      //     inputDom.style.zIndex = 500;
+          inputDom.parentNode.removeChild(inputDom);
+          document.body.appendChild(inputDom);
+          inputDom.style.zIndex = 500;
 
-      //     document.body.removeChild(searchDom)
-      //   }
-      // }
+          document.body.removeChild(searchDom);
+        }
+      }
 
       const canvases = document.getElementsByTagName("canvas");
 
       if (canvases.length === 2) {
-        const [canvasA, canvasB] = canvases;
+       const [canvasA, canvasB] = canvases;
 
         const parent = canvasA.parentElement;
 
@@ -130,11 +122,11 @@ const latLonGen = (lat, lon) => {
     childList: true
   });
 
-  p.addListener("pano_changed", () => {
-    viewLoader(view, [p.position.lat(), p.position.lng()], (image, cb) => cb(image));
-  });
+  // p.addListener("pano_changed", () => {
+  //   viewLoader(view, [p.position.lat(), p.position.lng()], (image, cb) => cb(image));
+  // });
 
-  p.addListener("pov_changed", () => {
-    console.log(p.getPov())
-  });
+  // p.addListener("pov_changed", () => {
+  //   // console.log(p.getPov())
+  // });
 })();

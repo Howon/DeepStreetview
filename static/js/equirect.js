@@ -46,6 +46,7 @@ module.exports = (id, opt, transform) => {
           const height = Math.min(tileHeight, data.height - y, data.height);
 
           let image = e.image;
+          console.log(e.image)
 
           if (!image || width !== image.width || height !== image.height) {
             canvas.width = width;
