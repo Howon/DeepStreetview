@@ -82,7 +82,6 @@ def _load_new(model_name):
     app.config['p'].start()
 
 
-'''
 @socketio.on_error()
 def error_handle(e):
     print(request.event['message'])
@@ -92,7 +91,6 @@ def error_handle(e):
                     'img' : default_img,
                     'position' : url_json['position'],})
     print "err: %s, emitted default" % url_json['id']
-'''
 
 
 @socketio.on('style')
