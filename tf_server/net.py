@@ -44,9 +44,6 @@ class Stylizer(object):
     def save(self, img, outpath):
         img.save(outpath)
 
-    def reload(self, model_path, arch='./models/model.meta'):
-        self.__init__(model_path, arch)
-
 
 def parse_args():
     parser = argparse.ArgumentParser(description = "Render image using pretrained model.")
