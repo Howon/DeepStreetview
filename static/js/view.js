@@ -1,7 +1,6 @@
 "use strict";
 
 const THREE = require("three");
-const PointerLockControls = require('three-pointerlock');
 const equirect = require("./equirect.js");
 const panoramaLocation = require("google-panorama-by-location");
 const bestZoom = require("google-panorama-zoom-level");

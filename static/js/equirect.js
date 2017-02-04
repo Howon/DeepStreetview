@@ -11,8 +11,8 @@ module.exports = (id, opt, transform) => {
 
   const data = getTiles(id, opt.zoom, opt.tiles);
 
-  let canvas = opt.canvas || document.createElement("canvas");
-  let context = canvas.getContext("2d");
+  const canvas = opt.canvas || document.createElement("canvas");
+  const context = canvas.getContext("2d");
 
   const images = data.images;
   const tileWidth = data.tileWidth;
@@ -28,7 +28,6 @@ module.exports = (id, opt, transform) => {
     };
 
     Promise.all(images.map(image => transformPromise(image))).then(newImages => {
-      console.log(newImages)
       emitter.emit("start", data);
 
       loader(newImages, {
@@ -47,7 +46,6 @@ module.exports = (id, opt, transform) => {
           const height = Math.min(tileHeight, data.height - y, data.height);
 
           let image = e.image;
-          console.log(e.image)
 
           if (!image || width !== image.width || height !== image.height) {
             canvas.width = width;

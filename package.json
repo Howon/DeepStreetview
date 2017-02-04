@@ -22,6 +22,7 @@
     "google-panorama-tiles": "^1.0.3",
     "google-panorama-url": "^1.0.0",
     "google-panorama-zoom-level": "^1.0.0",
+    "randomstring": "^1.1.5",
     "three": "^0.71.0",
     "three-orbit-viewer": "^69.3.0",
     "three-pointerlock": "0.0.2"

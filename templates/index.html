@@ -56,6 +56,7 @@
       }
 
       #pac-input {
+        outline: none;
         background-color: #fff;
         font-family: Roboto;
         font-size: 15px;
@@ -67,6 +68,7 @@
         margin: 15px auto;
         left: 0;
         right: 0;
+        border: 4px solid #404141;
       }
 
       #pac-input:focus {
@@ -95,12 +97,75 @@
         z-index: 50;
         background-color: transparent;
       }
+
+      ul {
+        list-style: none;
+        display: inline-block;
+        margin-left: 5px;
+        padding: 0;
+        margin: 0;
+      }
+
+      li.stylelist {
+        height: 150px;
+        padding-top: 5px;
+        filter: grayscale(.4) opacity(0.5);
+      }
+
+      .stylelist:hover {
+        filter: none;
+      }
+
+      #stylebox {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 500;
+        background-color: black;
+        padding: 7px 10px;
+      }
+
+      .preview {
+        width: 150px;
+        height: 150px;
+        cursor:pointer;
+      }
     </style>
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&libraries=places"></script>
   </head>
   <body id="body">
+    <div id="stylebox">
+      <ul>
+        <li class="stylelist" data-model="cubist">
+          <img class="preview" src="{{ url_for('static', filename='img/cubist.jpg') }}" alt="">
+        </li>
+        <li class="stylelist" data-model="feathers">
+          <img class="preview" src="{{ url_for('static', filename='img/feathers.jpg') }}" alt="">
+        </li>
+        <li class="stylelist" data-model="la_muse">
+          <img class="preview" src="{{ url_for('static', filename='img/la_muse.jpg') }}" alt="">
+        </li>
+        <li class="stylelist" data-model="mosaic">
+          <img class="preview" src="{{ url_for('static', filename='img/mosaic.jpg') }}" alt="">
+        </li>
+      </ul>
+      <ul>
+        <li class="stylelist" data-model="the_scream">
+          <img class="preview" src="{{ url_for('static', filename='img/the_scream.jpg') }}" alt="">
+        </li>
+        <li class="stylelist" data-model="udnie">
+          <img class="preview" src="{{ url_for('static', filename='img/udnie.jpg') }}" alt="">
+        </li>
+        <li class="stylelist" data-model="vii">
+          <img class="preview" src="{{ url_for('static', filename='img/vii.jpg') }}" alt="">
+        </li>
+        <li class="stylelist" data-model="wave">
+          <img class="preview" src="{{ url_for('static', filename='img/wave.jpg') }}" alt="">
+        </li>
+      </ul>
+    </div>
     <div id="view"></div>
     <div id="control"></div>
     <input id="pac-input" class="controls" type="text" placeholder="Search Box">

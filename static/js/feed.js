@@ -1,6 +1,8 @@
 "use strict";
 
 const viewLoader = require("./view");
+const RANDSTRGEN = require("randomstring");
+
 const HEADING = 90;
 const PITCH = 0;
 const IPADDRESSES = ["209.2.230.22"]
@@ -21,49 +23,58 @@ const latLonGen = (lat, lon) => {
 };
 
 (() => {
-  let image_id = 0;
-  const callback_map = {}
   const socket = io();
-  const tf_sockets = IPADDRESSES.reduce((acc, ip) => {
-    acc[ip] = io(ip);
 
-    return acc;
-  }, {});
+  const callbackMap = {};
 
   const [glat, glon] = [40.8058134, -73.962682];
   const view = document.getElementById("view");
   const controller = document.getElementById("control");
-  const searchDom = document.getElementById('map');
+  const searchDom = document.getElementById("map");
 
   socket.on("transformed", image => {
-    var iid = parseInt(image.id);
-    // console.log(image);
-
-    if (callback_map.hasOwnProperty(iid)) {
-      callback_map[iid](image);
-      // delete callback_map[iid];
-    } else {
-      // console.log(callback_map);
-      // console.log("Could not find the callback to invoke");
+    if (callbackMap.hasOwnProperty(image.id)) {
+      callbackMap[image.id](image);
     }
   })
 
-  let transform = (image, cb) => {
-    image['id'] = image_id;
+  let currentStyle = "none";
 
-    if (image_id > 100000) {
-      image_id = 0;
-    }
+  const transform = (image, cb) => {
+    const imageId = RANDSTRGEN.generate();
 
-    callback_map[image_id] = cb;
-    image_id++;
+    image.id = imageId;
+    image.style = currentStyle;
+
+    callbackMap[imageId] = cb;
 
     socket.emit("transform", image);
   }
 
   viewLoader(view, [glat, glon], transform);
 
-  var map = new google.maps.Map(searchDom, {
+  const styleOptionButtons = Array.from(document.getElementsByClassName("stylelist"));
+
+  const styleOnMap = styleOptionButtons.reduce((acc, elem) => {
+    acc[elem.getAttribute("data-model")] = elem;
+
+    return acc;
+  }, {});
+
+  console.log(styleOnMap)
+
+  styleOptionButtons.forEach(li => {
+    li.addEventListener("click", function(e) {
+      if (currentStyle !== "none") {
+        styleOnMap[currentStyle].style.filter = "grayscale(.2) opacity(0.5)";
+      }
+
+      currentStyle = this.getAttribute("data-model");
+      this.style.filter = "none";
+    })
+  });
+
+  const map = new google.maps.Map(searchDom, {
     center: {
       lat: glat,
       lng: glon
@@ -72,14 +83,14 @@ const latLonGen = (lat, lon) => {
     disablePanMomentum: true
   });
 
-  const inputDom = document.getElementById('pac-input');
+  const inputDom = document.getElementById("pac-input");
   const searchArea = new google.maps.places.SearchBox(inputDom);
 
   const p = new google.maps.StreetViewPanorama(controller, latLonGen(glat, glon)); //latLonGen(pos.coords.latitude, pos.coords.longitude));
 
   map.controls[google.maps.ControlPosition.TOP_LEFT].push(inputDom);
 
-  searchArea.addListener('places_changed', function() {
+  searchArea.addListener("places_changed", function() {
 
     const places = searchArea.getPlaces();
     if (places.length == 0) {
