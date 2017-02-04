@@ -41,14 +41,17 @@ const latLonGen = (lat, lon) => {
   let currentStyle = "none";
 
   const transform = (image, cb) => {
-    const imageId = RANDSTRGEN.generate();
+    if (currentStyle === "none") {
+      cb(image);
+    } else {
+      const imageId = RANDSTRGEN.generate();
 
-    image.id = imageId;
-    image.style = currentStyle;
+      image.id = imageId;
+      image.style = currentStyle;
 
-    callbackMap[imageId] = cb;
-
-    socket.emit("transform", image);
+      callbackMap[imageId] = cb;
+      socket.emit("transform", image);
+    }
   }
 
   viewLoader(view, [glat, glon], transform);
@@ -60,8 +63,6 @@ const latLonGen = (lat, lon) => {
 
     return acc;
   }, {});
-
-  console.log(styleOnMap)
 
   styleOptionButtons.forEach(li => {
     li.addEventListener("click", function(e) {
