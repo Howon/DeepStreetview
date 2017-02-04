@@ -1,3 +1,4 @@
+import thread
 from flask import Flask, render_template
 from socketIO_client import SocketIO as socket_io_client
 
@@ -22,16 +23,30 @@ def hello():
 
 @FRONT_END_SOCKET.on('transform')
 def stylize(img):
-    TRANSFORM_SOCKET.emit("style", img['url'])
-    emit("transformed", {
-        "url": img['url'],
-        "id": img['id']
-    })
+    TRANSFORM_SOCKET.emit("style", img)
+    # emit("transformed", {
+    #     "url": img['url'],
+    #     "id": img['id']
+    # })
+    # emit("transformed", {
+    #     "url": "https://www.aspcapetinsurance.com/media/1064/mountain-dog.jpg",
+    #     "id": img['id']
+    # })
+    # TRANSFORM_SOCKET.wait_for_callbacks(2)
 
-def relay_image_to_front_end(*args):
-    print "Received message from jibben " + str(args)
+def relay_image_to_front_end(img):
+    FRONT_END_SOCKET.emit("transformed", {
+        # "url": "https://www.aspcapetinsurance.com/media/1064/mountain-dog.jpg",
+        "url": 'data:image/jpeg;base64,{}'.format(img['img']),
+        "id": img['id'],
+        "position": img['position']
+    })
+    print "Received message from jibben "
+
+TRANSFORM_SOCKET.on("stylized", relay_image_to_front_end)
 
 # TRANSFORM_SOCKET.on("stylized", relay_image_to_front_end)
+thread.start_new_thread(TRANSFORM_SOCKET.wait)
 
 if __name__ == "__main__":
     FRONT_END_SOCKET.run(app, host="0.0.0.0", debug=True)

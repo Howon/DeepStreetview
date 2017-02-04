@@ -28,6 +28,7 @@ module.exports = (id, opt, transform) => {
     };
 
     Promise.all(images.map(image => transformPromise(image))).then(newImages => {
+      console.log(newImages)
       emitter.emit("start", data);
 
       loader(newImages, {
@@ -46,6 +47,7 @@ module.exports = (id, opt, transform) => {
           const height = Math.min(tileHeight, data.height - y, data.height);
 
           let image = e.image;
+          console.log(e.image)
 
           if (!image || width !== image.width || height !== image.height) {
             canvas.width = width;
