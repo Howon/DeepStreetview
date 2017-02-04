@@ -111,7 +111,7 @@ const latLonGen = (lat, lon) => {
     glat = places[0].geometry.location.lat();
     glon = places[0].geometry.location.lng();
 
-    viewLoader(view, getLatLon(), (image, cb) => cb(image));
+    viewLoader(view, [glat, glon], (image, cb) => cb(image));
   });
 
   const removeUnnecessaryDoms = new MutationObserver((mutations, observer) => {
@@ -175,7 +175,7 @@ const latLonGen = (lat, lon) => {
     glat = p.position.lat();
     glon = p.position.lng();
 
-    viewLoader(view, getLatLon(), (img, cb) => {
+    viewLoader(view, [glat, glon], (img, cb) => {
       transform(img, cb, currentStyle);
     });
   });
