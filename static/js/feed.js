@@ -97,7 +97,7 @@ const latLonGen = (lat, lon) => {
   const inputDom = document.getElementById("pac-input");
   const searchArea = new google.maps.places.SearchBox(inputDom);
 
-  const p = new google.maps.StreetViewPanorama(controller, latLonGen(glat, glon)); //latLonGen(pos.coords.latitude, pos.coords.longitude));
+  const p = new google.maps.StreetViewPanorama(controller, latLonGen(glat, glon));
 
   map.controls[google.maps.ControlPosition.TOP_LEFT].push(inputDom);
 
@@ -110,6 +110,14 @@ const latLonGen = (lat, lon) => {
 
     glat = places[0].geometry.location.lat();
     glon = places[0].geometry.location.lng();
+
+    p.setPosition({lat: glat, lng: glon});
+
+    if (currentStyle !== NOSTYLE) {
+      styleOnMap[currentStyle].style.filter = "grayscale(.2) opacity(0.5)";
+    }
+
+    currentStyle = NOSTYLE;
 
     viewLoader(view, [glat, glon], (image, cb) => cb(image));
   });
@@ -175,7 +183,7 @@ const latLonGen = (lat, lon) => {
     glat = p.position.lat();
     glon = p.position.lng();
 
-    viewLoader(view, [glat, glon], (img, cb) => {
+    viewLoader(view, getLatLon(), (img, cb) => {
       transform(img, cb, currentStyle);
     });
   });
