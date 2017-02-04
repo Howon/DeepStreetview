@@ -13,7 +13,7 @@ def parse_args():
     parser.add_argument("--arch", type = str, default = "./models/model.meta")
     args = parser.parse_args()
 
-    args.image = imread(args.input, mode = "RGB").astype(np.float32)
+    args.image = imread(args.input, mode = "RGB").astype(np.float16)
     args.image = np.expand_dims(args.image, axis = 0)
     return args
 
@@ -32,13 +32,6 @@ def run(session):
     result = np.squeeze(result, 0)
     time_t = time.time()
     print "First time. Time used: ", time_t - time_s
-
-    time_s = time.time()
-    result = output.eval({inputs : args.image})
-    result = np.clip(result, 0.0, 255.0).astype(np.uint8)
-    result = np.squeeze(result, 0)
-    time_t = time.time()
-    print "Second time. Time used: ", time_t - time_s
 
     imsave(args.output, result)
 

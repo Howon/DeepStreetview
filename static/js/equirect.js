@@ -4,8 +4,6 @@ const getTiles = require("./tiles");
 const loader = require("async-image-loader");
 const Emitter = require("events").EventEmitter;
 
-const emitter = new Emitter();
-
 const ZERO = [0, 0];
 
 module.exports = (id, opt, transform) => {
@@ -19,6 +17,8 @@ module.exports = (id, opt, transform) => {
   const images = data.images;
   const tileWidth = data.tileWidth;
   const tileHeight = data.tileHeight;
+
+  const emitter = new Emitter();
 
   const start = () => {
     const transformPromise = (image) => {
@@ -58,7 +58,6 @@ module.exports = (id, opt, transform) => {
 
             image = canvas;
           }
-
 
           emitter.emit("progress", {
             count: e.count,
