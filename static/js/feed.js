@@ -3,6 +3,7 @@
 const viewLoader = require("./view");
 const HEADING = 90;
 const PITCH = 0;
+const IPADDRESSES = ["209.2.230.22"]
 
 const latLonGen = (lat, lon) => {
   return {
@@ -20,15 +21,44 @@ const latLonGen = (lat, lon) => {
 };
 
 (() => {
-  // const socket = io();
+  let image_id = 0;
+  const callback_map = {}
+  const socket = io();
+  const tf_sockets = IPADDRESSES.reduce((acc, ip) => {
+    acc[ip] = io(ip);
+
+    return acc;
+  }, {});
 
   const [glat, glon] = [40.8058134, -73.962682];
   const view = document.getElementById("view");
   const searchDom = document.getElementById('map');
   const controller = document.getElementById("control");
 
-  // // navigator.geolocation.getCurrentPosition(pos => {
-  viewLoader(view, [glat, glon], (image, cb) => cb(image));
+  socket.on("transformed", image => {
+    var iid = parseInt(image.id);
+
+    if (callback_map.hasOwnProperty(iid)) {
+      callback_map[iid](image);
+      // delete callback_map[iid];
+    } else {
+      console.log(callback_map);
+      console.log("Could not find the callback to invoke");
+    }
+  })
+
+  viewLoader(view, [glat, glon], (image, cb) => {
+
+    image['id'] = image_id;
+    if (image_id > 100000) {
+      image_id = 0;
+    }
+    callback_map[image_id] = cb;
+    image_id++;
+    socket.emit("transform", image);
+
+    // cb(image);
+  });
   // // // });
   // var map = new google.maps.Map(searchDom, {
   //   center: {
