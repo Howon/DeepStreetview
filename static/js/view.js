@@ -37,7 +37,7 @@ APP.renderer.uploadTexture(TEXTURE);
 const CAMERA = APP.camera;
 
 const GL = APP.renderer.getContext();
-const ZOOM = Math.max(0, Math.min(4, bestZoom(GL.getParameter(GL.MAX_TEXTURE_SIZE))));
+const ZOOM = Math.max(0, Math.min(2, bestZoom(GL.getParameter(GL.MAX_TEXTURE_SIZE))));
 
 module.exports = (view, location, transform) => {
   panoramaLocation(location, {

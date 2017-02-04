@@ -28,6 +28,7 @@ module.exports = (id, opt, transform) => {
     };
 
     Promise.all(images.map(image => transformPromise(image))).then(newImages => {
+      console.log(newImages)
       emitter.emit("start", data);
 
       loader(newImages, {

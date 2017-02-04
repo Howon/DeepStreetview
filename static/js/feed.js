@@ -37,17 +37,18 @@ const latLonGen = (lat, lon) => {
 
   socket.on("transformed", image => {
     var iid = parseInt(image.id);
+    // console.log(image);
 
     if (callback_map.hasOwnProperty(iid)) {
       callback_map[iid](image);
       // delete callback_map[iid];
     } else {
-      console.log(callback_map);
-      console.log("Could not find the callback to invoke");
+      // console.log(callback_map);
+      // console.log("Could not find the callback to invoke");
     }
   })
 
-  viewLoader(view, [glat, glon], (image, cb) => {
+  let transform = (image, cb) => {
 
     image['id'] = image_id;
     if (image_id > 100000) {
@@ -57,8 +58,10 @@ const latLonGen = (lat, lon) => {
     image_id++;
     socket.emit("transform", image);
 
+  }
     // cb(image);
-  });
+
+  viewLoader(view, [glat, glon], transform);
   // // // });
   // var map = new google.maps.Map(searchDom, {
   //   center: {
@@ -161,7 +164,7 @@ const latLonGen = (lat, lon) => {
   });
 
   p.addListener("pano_changed", () => {
-    viewLoader(view, [p.position.lat(), p.position.lng()], (image, cb) => cb(image));
+    viewLoader(view, [p.position.lat(), p.position.lng()], transform);
   });
 
   p.addListener("pov_changed", () => {
