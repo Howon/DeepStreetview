@@ -60,7 +60,7 @@ def parse_args():
 def main():
     args = parse_args()
     s = Stylizer(args.model, args.arch)
-    img = s.stylize(args.input)
+    img = s.stylize_path(args.input)
     s.save(img, args.output)
 
 if __name__ == "__main__":
